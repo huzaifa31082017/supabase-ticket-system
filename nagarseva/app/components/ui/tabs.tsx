@@ -31,7 +31,7 @@ interface TabsContextType {
 }
 
 // Create context for tabs
-const TabsContext = require('react').createContext<TabsContextType | undefined>(undefined)
+const TabsContext = React.createContext<TabsContextType | undefined>(undefined);
 
 export function Tabs({ defaultValue = '', className = '', children }: TabsProps) {
   const [activeTab, setActiveTab] = useState(defaultValue)
