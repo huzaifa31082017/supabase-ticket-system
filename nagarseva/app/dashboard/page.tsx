@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/tabs'
 import PublicDashboard from '@/app/components/PublicDashboard'
@@ -10,39 +9,44 @@ import { BarChart3, Ticket } from 'lucide-react'
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('public')
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [authError, setAuthError] = useState<string | null>(null)
-  const router = useRouter()
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
         console.log('🔐 Dashboard: Checking authentication...')
-        const {
-          data: { session },
-          error: sessionError,
-        } = await supabase.auth.getSession()
+        
+        const { data, error } = await supabase.auth.getSession()
+        const session = data?.session
 
-        console.log('🔐 Dashboard: Session check result:', { hasSession: !!session, error: sessionError?.message })
+        console.log('🔐 Dashboard: Session check result:', {
+          hasSession: !!session,
+          userEmail: session?.user.email,
+          error: error?.message,
+        })
 
-        if (sessionError) {
-          console.error('❌ Dashboard: Session error:', sessionError)
+        if (error) {
+          console.error('❌ Dashboard: Session error:', error)
+          setIsLoading(false)
           window.location.href = '/auth'
           return
         }
 
         if (!session) {
-          console.log('⚠️ Dashboard: No session found, redirecting to auth')
+          console.log('⚠️ Dashboard: No session found, user not authenticated')
+          setIsLoading(false)
+          // IMPORTANT: Use window.location to force actual navigation
           window.location.href = '/auth'
           return
         }
 
         console.log('✅ Dashboard: User authenticated:', session.user.email)
+        setIsAuthenticated(true)
         setIsLoading(false)
       } catch (error) {
-        console.error('❌ Dashboard: Auth check error:', error)
-        const errorMsg = error instanceof Error ? error.message : 'Unknown error'
-        setAuthError(errorMsg)
+        console.error('❌ Dashboard: Error checking session:', error)
+        setIsLoading(false)
         window.location.href = '/auth'
       }
     }
@@ -50,24 +54,21 @@ export default function DashboardPage() {
     checkAuth()
   }, [])
 
+  // Don't render dashboard content until authenticated
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-16">
-        <div className="text-slate-400">Loading...</div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-slate-400">Verifying access...</div>
       </div>
     )
   }
 
-  if (authError) {
-    return (
-      <div className="flex items-center justify-center py-16">
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-6 text-red-100">
-          <p>Authentication Error: {authError}</p>
-        </div>
-      </div>
-    )
+  // If not authenticated, don't render anything (the redirect should have happened)
+  if (!isAuthenticated) {
+    return null
   }
 
+  // Only render dashboard if authenticated
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -77,7 +78,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Tabs */}
-         <Tabs defaultValue="public" className="w-full">
+      <Tabs defaultValue="public" className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-slate-800 border border-slate-700 p-1">
           <TabsTrigger
             value="public"
