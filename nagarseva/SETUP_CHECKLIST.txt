@@ -1,0 +1,49 @@
+📋 COMPLETE SETUP CHECKLIST
+===========================
+
+✅ Step 1: Environment Variables
+   - NEXT_PUBLIC_SUPABASE_URL: Set in Vercel ✓
+   - NEXT_PUBLIC_SUPABASE_ANON_KEY: Set in Vercel ✓
+   - SUPABASE_SERVICE_ROLE_KEY: Set in Vercel ✓
+
+✅ Step 2: Application Deployed
+   - URL: https://supabase-ticket-system-j98j.vercel.app ✓
+   - Setup page automatically created ✓
+
+⏳ Step 3: Database Initialization (YOU ARE HERE)
+   - Visit the setup page (if not already there)
+   - Click "Copy SQL Schema" button
+   - Paste into Supabase SQL Editor
+   - Click Run
+   - Return and click "Recheck Database Setup"
+
+✅ Step 4: Login
+   - Demo Email: demo@nagarseva.com
+   - Demo Password: demo1234
+   - Or create a new account
+
+===========================
+
+TROUBLESHOOTING CHECKLIST:
+
+If you see "Database tables not found":
+- [ ] Logged into Supabase dashboard
+- [ ] Can see SQL Editor in left sidebar
+- [ ] Pasted the complete SQL schema
+- [ ] Clicked Run (not Save)
+- [ ] Waited for the query to complete
+- [ ] Checked for any SQL errors in the response
+
+If you see "Supabase connection failed":
+- [ ] Check all three env vars are set in Vercel
+- [ ] Verify SUPABASE_SERVICE_ROLE_KEY is NOT the same as ANON_KEY
+- [ ] Wait 2-3 minutes after setting env vars (Vercel needs time to apply changes)
+- [ ] Manually redeploy in Vercel (Settings → Redeploy)
+
+If everything is working:
+- [ ] You should see a "Database Ready" message
+- [ ] Button should say "Go to Dashboard"
+- [ ] Click it and log in with demo credentials
+- [ ] You'll see the dashboard with ward data and tickets
+
+===========================
