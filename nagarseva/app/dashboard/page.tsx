@@ -51,7 +51,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+         <Tabs defaultValue="public" className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-slate-800 border border-slate-700 p-1">
           <TabsTrigger
             value="public"
