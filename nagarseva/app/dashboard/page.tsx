@@ -17,40 +17,38 @@ export default function DashboardPage() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        console.log('🔐 Checking authentication...')
+        console.log('🔐 Dashboard: Checking authentication...')
         const {
           data: { session },
           error: sessionError,
         } = await supabase.auth.getSession()
 
-        console.log('🔐 Session check result:', { hasSession: !!session, error: sessionError?.message })
+        console.log('🔐 Dashboard: Session check result:', { hasSession: !!session, error: sessionError?.message })
 
         if (sessionError) {
-          console.error('❌ Session error:', sessionError)
-          setAuthError(sessionError.message)
-          router.push('/auth')
+          console.error('❌ Dashboard: Session error:', sessionError)
+          window.location.href = '/auth'
           return
         }
 
         if (!session) {
-          console.log('⚠️ No session found, redirecting to auth')
-          router.push('/auth')
+          console.log('⚠️ Dashboard: No session found, redirecting to auth')
+          window.location.href = '/auth'
           return
         }
 
-        console.log('✅ User authenticated:', session.user.email)
+        console.log('✅ Dashboard: User authenticated:', session.user.email)
+        setIsLoading(false)
       } catch (error) {
-        console.error('❌ Auth check error:', error)
+        console.error('❌ Dashboard: Auth check error:', error)
         const errorMsg = error instanceof Error ? error.message : 'Unknown error'
         setAuthError(errorMsg)
-        router.push('/auth')
-      } finally {
-        setIsLoading(false)
+        window.location.href = '/auth'
       }
     }
 
     checkAuth()
-  }, [router])
+  }, [])
 
   if (isLoading) {
     return (
