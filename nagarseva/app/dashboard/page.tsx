@@ -11,6 +11,7 @@ import { BarChart3, Ticket } from 'lucide-react'
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('public')
   const [isLoading, setIsLoading] = useState(true)
+  const [authError, setAuthError] = useState<string | null>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -18,13 +19,23 @@ export default function DashboardPage() {
       try {
         const {
           data: { session },
+          error: sessionError,
         } = await supabase.auth.getSession()
+
+        if (sessionError) {
+          console.error('Session check error:', sessionError)
+          setAuthError(sessionError.message)
+          router.push('/auth')
+          return
+        }
 
         if (!session) {
           router.push('/auth')
         }
       } catch (error) {
         console.error('Auth check error:', error)
+        const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+        setAuthError(errorMsg)
         router.push('/auth')
       } finally {
         setIsLoading(false)
@@ -38,6 +49,16 @@ export default function DashboardPage() {
     return (
       <div className="flex items-center justify-center py-16">
         <div className="text-slate-400">Loading...</div>
+      </div>
+    )
+  }
+
+  if (authError) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-6 text-red-100">
+          <p>Authentication Error: {authError}</p>
+        </div>
       </div>
     )
   }

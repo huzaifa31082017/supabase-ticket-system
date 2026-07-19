@@ -63,6 +63,7 @@ export default function PublicDashboard() {
         <div>
           <h3 className="font-semibold text-red-200 mb-1">Error</h3>
           <p className="text-sm text-red-100">{error}</p>
+          <p className="text-xs text-red-200 mt-2">Make sure Supabase tables are created. Check the database schema.</p>
         </div>
       </div>
     )

@@ -3,7 +3,7 @@
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { LogOut, User, Home } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 
 export default function Navbar() {
   const [user, setUser] = useState<any>(null)
@@ -11,12 +11,26 @@ export default function Navbar() {
   const router = useRouter()
 
   useEffect(() => {
+    let mounted = true
+
     const getUser = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      setUser(session?.user)
-      setLoading(false)
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
+        if (mounted) {
+          setUser(session?.user || null)
+        }
+      } catch (error) {
+        console.error('Error getting user:', error)
+        if (mounted) {
+          setUser(null)
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
+      }
     }
 
     getUser()
@@ -24,15 +38,24 @@ export default function Navbar() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user)
+      if (mounted) {
+        setUser(session?.user || null)
+      }
     })
 
-    return () => subscription?.unsubscribe()
+    return () => {
+      mounted = false
+      subscription?.unsubscribe()
+    }
   }, [])
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push('/auth')
+    try {
+      await supabase.auth.signOut()
+      router.push('/auth')
+    } catch (error) {
+      console.error('Error signing out:', error)
+    }
   }
 
   if (loading) {
@@ -65,7 +88,7 @@ export default function Navbar() {
 
           {/* User Menu */}
           <div className="flex items-center gap-4">
-            {user && (
+            {user ? (
               <>
                 <div className="text-right hidden sm:block">
                   <p className="text-sm text-slate-200 truncate max-w-xs">{user.email}</p>
@@ -79,7 +102,7 @@ export default function Navbar() {
                   <span className="hidden sm:inline">Logout</span>
                 </button>
               </>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
