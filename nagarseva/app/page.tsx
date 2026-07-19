@@ -29,7 +29,7 @@ export default function RootPage() {
           logs.push('→ Redirecting to /auth')
           setDetails([...logs])
           setStatus('redirecting')
-          window.location.href = '/auth'
+          window.location.replace('/auth')
           return
         }
 
@@ -43,7 +43,7 @@ export default function RootPage() {
           logs.push('→ Redirecting to /dashboard')
           setDetails([...logs])
           setStatus('redirecting')
-          window.location.href = '/dashboard'
+          window.location.replace('/dashboard')
           return
         }
 
@@ -117,7 +117,7 @@ export default function RootPage() {
           <div className="grid grid-cols-2 gap-2 pt-4 border-t border-slate-700">
             <button
               onClick={() => {
-                window.location.href = '/auth'
+                window.location.replace('/auth')
               }}
               className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded font-medium transition"
             >
@@ -125,7 +125,7 @@ export default function RootPage() {
             </button>
             <button
               onClick={() => {
-                window.location.href = '/dashboard'
+                window.location.replace('/dashboard')
               }}
               className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded font-medium transition"
             >
