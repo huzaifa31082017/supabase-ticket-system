@@ -11,19 +11,28 @@ export default function RootPage() {
   useEffect(() => {
     const checkSession = async () => {
       try {
+        // First check if database is initialized
+        const dbCheck = await fetch('/api/init-db', { method: 'POST' })
+        const dbData = await dbCheck.json()
+
+        if (!dbCheck.ok) {
+          // Database not initialized, go to setup
+          router.push('/setup')
+          return
+        }
+
+        // Database is ready, check session
         const {
           data: { session },
         } = await supabase.auth.getSession()
 
         if (session) {
-          // User is authenticated, redirect to dashboard
           router.push('/dashboard')
         } else {
-          // User is not authenticated, redirect to auth
           router.push('/auth')
         }
       } catch (error) {
-        console.error('Error checking session:', error)
+        console.error('Error during initialization:', error)
         router.push('/auth')
       } finally {
         setIsLoading(false)
@@ -33,7 +42,6 @@ export default function RootPage() {
     checkSession()
   }, [router])
 
-  // Loading state with minimal UI
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
@@ -47,6 +55,5 @@ export default function RootPage() {
     )
   }
 
-  // Should not render this as we redirect in useEffect
   return null
 }

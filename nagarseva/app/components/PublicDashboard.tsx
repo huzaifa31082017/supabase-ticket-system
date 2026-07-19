@@ -3,14 +3,6 @@
 import { useEffect, useState } from 'react'
 import { getWards, getDashboardStats } from '@/app/actions/sla-actions'
 import { Ward, DashboardStats } from '@/app/types'
-import { TrendingUp, Users, BarChart3, AlertCircle } from 'lucide-react'
-
-export default function PublicDashboard() {
-  const [wards, setWards] = useState<Ward[]>([])
-  const [stats, setStats] = useState<DashboardStats | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -22,14 +14,25 @@ export default function PublicDashboard() {
         setWards(wardsData)
         setStats(statsData)
       } catch (err) {
-        setError('Failed to load dashboard data')
-        console.error(err)
+        const errorMsg = err instanceof Error ? err.message : 'Unknown error'
+        console.error('Dashboard data fetch error:', errorMsg)
+        
+        if (errorMsg.includes('relation') || errorMsg.includes('table') || errorMsg.includes('does not exist')) {
+          setError('Database tables not found. Please follow the setup instructions to initialize your Supabase schema.')
+        } else {
+          setError(`Failed to load dashboard data: ${errorMsg}`)
+        }
       } finally {
         setLoading(false)
       }
     }
 
     fetchData()
+
+    // Refresh every 60 seconds
+    const interval = setInterval(fetchData, 60000)
+    return () => clearInterval(interval)
+  }, [])
 
     // Refresh every 60 seconds
     const interval = setInterval(fetchData, 60000)

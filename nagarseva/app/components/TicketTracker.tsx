@@ -27,8 +27,14 @@ export default function TicketTracker() {
       const data = await getTickets()
       setTickets(data)
     } catch (err) {
-      setError('Failed to load tickets')
-      console.error(err)
+      const errorMsg = err instanceof Error ? err.message : 'Unknown error'
+      console.error('Ticket fetch error:', errorMsg)
+      
+      if (errorMsg.includes('relation') || errorMsg.includes('table') || errorMsg.includes('does not exist')) {
+        setError('Database tables not found. Please follow the setup instructions to initialize your Supabase schema.')
+      } else {
+        setError(`Failed to load tickets: ${errorMsg}`)
+      }
     } finally {
       setLoading(false)
     }
