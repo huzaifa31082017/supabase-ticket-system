@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import DbInitializer from '@/app/components/DbInitializer'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -21,8 +22,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
+        <DbInitializer />
         {children}
       </body>
+    </html>
+  )
+}
+
     </html>
   )
 }
