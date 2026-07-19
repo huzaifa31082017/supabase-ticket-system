@@ -1,6 +1,7 @@
 'use client'
 
 import { ReactNode, useState } from 'react'
+import React from 'react';
 
 interface TabsProps {
   defaultValue?: string
