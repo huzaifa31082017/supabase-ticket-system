@@ -19,12 +19,15 @@ export async function getWards(): Promise<Ward[]> {
       .select('*')
       .order('responsiveness_score', { ascending: false })
     
-    if (error) throw error
+    if (error) {
+      console.error('Supabase error fetching wards:', error.message, error.code)
+      throw error
+    }
     
     return data || []
   } catch (error) {
     console.error('Error fetching wards:', error)
-    throw new Error('Failed to fetch wards')
+    throw new Error(`Failed to fetch wards: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }
 
@@ -358,26 +361,40 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   const supabase = createServerSupabaseClient()
   
   try {
+    console.log('Fetching dashboard stats...')
+    
     // Total active issues
-    const { count: totalCount } = await supabase
+    const { count: totalCount, error: countError } = await supabase
       .from('tickets')
       .select('*', { count: 'exact', head: true })
       .in('status', ['Open', 'In Progress'])
+    
+    if (countError) {
+      console.error('Error fetching ticket count:', countError)
+    }
     
     // Issues escalated today
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     
-    const { count: escalatedTodayCount } = await supabase
+    const { count: escalatedTodayCount, error: escalatedError } = await supabase
       .from('tickets')
       .select('*', { count: 'exact', head: true })
       .eq('is_escalated', true)
       .gte('escalated_at', today.toISOString())
     
+    if (escalatedError) {
+      console.error('Error fetching escalated count:', escalatedError)
+    }
+    
     // City-wide average score
-    const { data: wards } = await supabase
+    const { data: wards, error: wardsError } = await supabase
       .from('wards')
       .select('responsiveness_score')
+    
+    if (wardsError) {
+      console.error('Error fetching wards for average:', wardsError)
+    }
     
     const avgScore = wards && wards.length > 0
       ? wards.reduce((sum, w) => sum + w.responsiveness_score, 0) / wards.length
