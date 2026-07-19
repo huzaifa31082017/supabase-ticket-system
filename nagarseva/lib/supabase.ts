@@ -7,15 +7,15 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Server-side client (with service role key for admin operations)
 export const createServerSupabaseClient = () => {
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  
-  if (!serviceRoleKey) {
-    console.warn('SUPABASE_SERVICE_ROLE_KEY not set, falling back to anon key')
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error(`Missing Supabase environment variables. URL: ${!!supabaseUrl}, Key: ${!!supabaseAnonKey}`)
   }
+  
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || supabaseAnonKey
   
   return createClient(
     supabaseUrl,
-    serviceRoleKey || supabaseAnonKey,
+    serviceRoleKey,
     {
       auth: {
         autoRefreshToken: false,
@@ -24,5 +24,4 @@ export const createServerSupabaseClient = () => {
     }
   )
 }
-// Example: In your page.tsx or lib/supabase.ts
 
