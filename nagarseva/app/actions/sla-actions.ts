@@ -11,23 +11,33 @@ import { Ward, Ticket, DashboardStats, TicketWithTimeRemaining } from '@/app/typ
  * Fetch all wards ordered by responsiveness score (descending)
  */
 export async function getWards(): Promise<Ward[]> {
-  const supabase = createServerSupabaseClient()
-  
   try {
+    const supabase = createServerSupabaseClient()
+    console.log('🔍 getWards: Creating Supabase client...')
+    
     const { data, error } = await supabase
       .from('wards')
       .select('*')
       .order('responsiveness_score', { ascending: false })
     
+    console.log('🔍 getWards response:', { data, error })
+    
     if (error) {
-      console.error('Supabase error fetching wards:', error.message, error.code)
+      console.error('❌ Supabase error fetching wards:', {
+        message: error.message,
+        code: error.code,
+        details: (error as any).details,
+        hint: (error as any).hint,
+      })
       throw error
     }
     
+    console.log('✅ getWards: Found', data?.length || 0, 'wards')
     return data || []
   } catch (error) {
-    console.error('Error fetching wards:', error)
-    throw new Error(`Failed to fetch wards: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    console.error('❌ Error fetching wards:', error)
+    const msg = error instanceof Error ? error.message : JSON.stringify(error)
+    throw new Error(`Failed to fetch wards: ${msg}`)
   }
 }
 
