@@ -8,8 +8,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 // Server-side client (with service role key for admin operations)
 export const createServerSupabaseClient = () => {
   return createClient(
-    process.env.supabaseUrl || '',
-    process.env.supabaseAnonKey|| '',
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
     {
       auth: {
         autoRefreshToken: false,
